@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+
+<Events>
+    <Event id="connect">
+        <Name>Bouncie Connect - WebHook</Name>
+        <ConfigUI>
+			<Field id="vehicle" type="menu">
+				<Label>Vehicle</Label>
+				<List class="self" filter="" method="getVehiclesList" dynamicReload="true"/>
+			</Field>
+		</ConfigUI>
+    </Event>
+    <Event id="disconnect">
+        <Name>Bouncie Disconnect - WebHook</Name>
+        <ConfigUI>
+			<Field id="vehicle" type="menu">
+				<Label>Vehicle</Label>
+				<List class="self" filter="" method="getVehiclesList" dynamicReload="true"/>
+			</Field>
+		</ConfigUI>
+    </Event>
+    <Event id="battery">
+        <Name>Battery Health - WebHook</Name>
+        <ConfigUI>
+			<Field id="vehicle" type="menu">
+				<Label>Vehicle</Label>
+				<List class="self" filter="" method="getVehiclesList" dynamicReload="true"/>
+			</Field>
+		</ConfigUI>
+    </Event>
+    <Event id="mil">
+        <Name>MIL Health - WebHook</Name>
+        <ConfigUI>
+			<Field id="vehicle" type="menu">
+				<Label>Vehicle</Label>
+				<List class="self" filter="" method="getVehiclesList" dynamicReload="true"/>
+			</Field>
+		</ConfigUI>
+    </Event>
+    <Event id="tripStart">
+        <Name>Trip Start - WebHook</Name>
+        <ConfigUI>
+			<Field id="vehicle" type="menu">
+				<Label>Vehicle</Label>
+				<List class="self" filter="" method="getVehiclesList" dynamicReload="true"/>
+			</Field>
+		</ConfigUI>
+    </Event>
+    <Event id="tripData">
+        <Name>Trip Data - WebHook</Name>
+        <ConfigUI>
+			<Field id="vehicle" type="menu">
+				<Label>Vehicle</Label>
+				<List class="self" filter="" method="getVehiclesList" dynamicReload="true"/>
+			</Field>
+		</ConfigUI>
+    </Event>
+    <Event id="tripMetrics">
+        <Name>Trip Metrics - WebHook</Name>
+        <ConfigUI>
+			<Field id="vehicle" type="menu">
+				<Label>Vehicle</Label>
+				<List class="self" filter="" method="getVehiclesList" dynamicReload="true"/>
+			</Field>
+		</ConfigUI>
+    </Event>
+    <Event id="tripEnd">
+        <Name>Trip End - WebHook</Name>
+        <ConfigUI>
+			<Field id="vehicle" type="menu">
+				<Label>Vehicle</Label>
+				<List class="self" filter="" method="getVehiclesList" dynamicReload="true"/>
+			</Field>
+		</ConfigUI>
+    </Event>
+    
+    <!-- coming soon... with integration from Google Maps -->
+    
+    <!--
+    <Event id="location_updated">
+        <Name>Location Updated</Name>
+        <ConfigUI>
+			<Field id="vehicle" type="menu">
+				<Label>Vehicle</Label>
+				<List class="self" filter="" method="getVehiclesList" dynamicReload="true"/>
+			</Field>
+		</ConfigUI>
+    </Event>
+    <Event id="approaching_home">
+        <Name>Approaching Home</Name>
+        <ConfigUI>
+			<Field id="vehicle" type="menu">
+				<Label>Vehicle</Label>
+				<List class="self" filter="" method="getVehiclesList" dynamicReload="true"/>
+			</Field>
+		</ConfigUI>
+    </Event>
+    -->
+    
+    <!--
+    <Event id="miles_to_home">
+        <Name>Miles to Home</Name>
+        <ConfigUI>
+			<Field id="vehicle" type="menu">
+				<Label>Vehicle</Label>
+				<List class="self" filter="" method="getVehiclesList" dynamicReload="true"/>
+			</Field>
+			<Field id="milesToHome" type="textfield" defaultValue="3">
+				<Label>Miles:</Label>
+			</Field>
+		</ConfigUI>
+    </Event>
+    -->
+</Events>

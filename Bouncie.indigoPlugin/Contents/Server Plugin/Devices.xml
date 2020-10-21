@@ -1,0 +1,182 @@
+<?xml version="1.0"?>
+<Devices>
+	<Device type="custom" id="myBouncieCustomType">
+		<Name>Bouncie</Name>
+		<ConfigUI>
+			<Field id="vehicle" type="menu">
+				<Label>Vehicle</Label>
+				<List class="self" filter="" method="getVehiclesList" dynamicReload="true"/>
+			</Field>
+		</ConfigUI>
+		<States>
+			<State id="model-make" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>make</TriggerLabel>
+				<ControlPageLabel>make</ControlPageLabel>
+			</State>
+			<State id="model-name" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>name</TriggerLabel>
+				<ControlPageLabel>name</ControlPageLabel>
+			</State>
+			<State id="model-year" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>year</TriggerLabel>
+				<ControlPageLabel>year</ControlPageLabel>
+			</State>
+			<State id="nickname" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>nickname</TriggerLabel>
+				<ControlPageLabel>nickname</ControlPageLabel>
+			</State>
+			<State id="standardEngine" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>standardEngine</TriggerLabel>
+				<ControlPageLabel>standardEngine</ControlPageLabel>
+			</State>
+			<State id="vin" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>vin</TriggerLabel>
+				<ControlPageLabel>vin</ControlPageLabel>
+			</State>
+			<State id="imei" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>imei</TriggerLabel>
+				<ControlPageLabel>imei</ControlPageLabel>
+			</State>
+			<State id="stats-localTimezone" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>localTimezone</TriggerLabel>
+				<ControlPageLabel>localTimezone</ControlPageLabel>
+			</State>
+			<State id="stats-lastUpdated" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>statsLastUpdated</TriggerLabel>
+				<ControlPageLabel>statsLastUpdated</ControlPageLabel>
+			</State>
+			<State id="stats-location-lat" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>locationLat</TriggerLabel>
+				<ControlPageLabel>locationLat</ControlPageLabel>
+			</State>
+			<State id="stats-location-long" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>locationLong</TriggerLabel>
+				<ControlPageLabel>locationLong</ControlPageLabel>
+			</State>
+			<State id="stats-location-heading" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>locationHeading</TriggerLabel>
+				<ControlPageLabel>locationHeading</ControlPageLabel>
+			</State>
+			<State id="stats-location-address" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>locationAddress</TriggerLabel>
+				<ControlPageLabel>locationAddress</ControlPageLabel>
+			</State>
+			<State id="stats-fuelLevel" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>fuelLevel</TriggerLabel>
+				<ControlPageLabel>fuelLevel</ControlPageLabel>
+			</State>
+			<State id="stats-isRunning" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>isRunning</TriggerLabel>
+				<ControlPageLabel>isRunning</ControlPageLabel>
+			</State>
+			<State id="stats-speed" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>speed</TriggerLabel>
+				<ControlPageLabel>speed</ControlPageLabel>
+			</State>
+
+			<State id="mil-milOn" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>milOn</TriggerLabel>
+				<ControlPageLabel>milOn</ControlPageLabel>
+			</State>
+			<State id="mil-lastUpdated" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>milLastUpdated</TriggerLabel>
+				<ControlPageLabel>milLastUpdated</ControlPageLabel>
+			</State>
+
+			<State id="battery-status" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>batteryStatus</TriggerLabel>
+				<ControlPageLabel>batteryStatus</ControlPageLabel>
+			</State>
+			<State id="battery-lastUpdated" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>batteryLastUpdated</TriggerLabel>
+				<ControlPageLabel>batteryLastUpdated</ControlPageLabel>
+			</State>
+
+			<State id="vehicleJSON" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>vehicleJSON</TriggerLabel>
+				<ControlPageLabel>vehicleJSON</ControlPageLabel>
+			</State>
+			<State id="webHookJSON-connect" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>webHookJSON-connect</TriggerLabel>
+				<ControlPageLabel>webHookJSON-connect</ControlPageLabel>
+			</State>
+			<State id="webHookJSON-disconnect" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>webHookJSON-disconnect</TriggerLabel>
+				<ControlPageLabel>webHookJSON-disconnect</ControlPageLabel>
+			</State>
+			<State id="webHookJSON-battery" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>webHookJSON-battery</TriggerLabel>
+				<ControlPageLabel>webHookJSON-battery</ControlPageLabel>
+			</State>
+			<State id="webHookJSON-mil" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>webHookJSON-mil</TriggerLabel>
+				<ControlPageLabel>webHookJSON-mil</ControlPageLabel>
+			</State>
+			<State id="webHookJSON-tripStart" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>webHookJSON-tripStart</TriggerLabel>
+				<ControlPageLabel>webHookJSON-tripStart</ControlPageLabel>
+			</State>
+			<State id="webHookJSON-tripData" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>webHookJSON-tripData</TriggerLabel>
+				<ControlPageLabel>webHookJSON-tripData</ControlPageLabel>
+			</State>
+			<State id="webHookJSON-tripMetrics" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>webHookJSON-tripMetrics</TriggerLabel>
+				<ControlPageLabel>webHookJSON-tripMetrics</ControlPageLabel>
+			</State>
+			<State id="webHookJSON-tripEnd" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>webHookJSON-tripEnd</TriggerLabel>
+				<ControlPageLabel>webHookJSON-tripEnd</ControlPageLabel>
+			</State>
+
+			<!-- coming soon... with integration from Google Maps -->
+			
+			<!--
+			<State id="ETA" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>ETA</TriggerLabel>
+				<ControlPageLabel>ETA</ControlPageLabel>
+			</State>
+			<State id="previousMilesFromHome" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>previousMilesFromHome</TriggerLabel>
+				<ControlPageLabel>previousMilesFromHome</ControlPageLabel>
+			</State>
+			<State id="currentMilesFromHome" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>currentMilesFromHome</TriggerLabel>
+				<ControlPageLabel>currentMilesFromHome</ControlPageLabel>
+			</State>
+			-->
+		</States>
+	</Device>
+</Devices>

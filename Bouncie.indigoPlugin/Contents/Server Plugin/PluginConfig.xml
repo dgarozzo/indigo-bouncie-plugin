@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+
+<PluginConfig>
+
+	<Field id="instructionsDeveloperAccountLabel" type="label" fontSize="small">
+		<Label>To configure the Bouncie plugin, you first need to register for a free Bouncie developer account. You can do that at https://dev.bouncie.com. Enter in your OAuth Client ID and OAuth Secret here:</Label>
+	</Field>
+
+	<Field id="clientId" type="textfield" defaultValue="">
+		<Label>OAuth Client ID:</Label>
+	</Field>
+
+	<Field id="clientSecret" type="textfield" defaultValue="">
+		<Label>OAuth Secret:</Label>
+	</Field>
+	
+	<Field id="getAuthorizationButton" type="button" tooltip="Click this button after you have filled in your OAuth Client ID and OAuth Secret:">
+		<Label>Click to Authorize</Label>
+		<Title>Go </Title>
+		<CallbackMethod>getAuthorization</CallbackMethod>
+	</Field>
+	
+	<Field id="instructionsAuthorizationLabel" type="label" fontSize="small">
+		<Label>After you log on to Bouncie with your account and authorize access, you will be redirected to another page. Enter the full callback URL below. It should start with whatever you configured on your Developer page (http://localhost/OAuthRedirectURL).</Label>
+	</Field>
+	
+	<Field id="callbackURL" type="textfield" defaultValue="">
+		<Label>Callback URL:</Label>
+	</Field>
+	
+	<Field id="accessTokenFail" type="label" visibleBindingId="accessTokenFailCheckbox" visibleBindingValue="true" fontSize="small" alwaysUseInDialogHeightCalc="true">
+		<Label>There was a problem getting your access token. Please click the Go button and carefully capture the Callback URL again.</Label>
+	</Field>
+	
+	<Field id="accessTokenFailCheckbox" hidden="true" type="checkbox" defaultValue="false"></Field>
+	
+	<Field id="getAccessTokenButton" type="button" tooltip="Click this button after you have filled in the Callback URL">
+		<Label>Click to obtain Access Token</Label>
+		<Title>Go </Title>
+		<CallbackMethod>getAccessToken</CallbackMethod>
+	</Field>
+
+	<Field id="accessTokenJson" type="textfield" defaultValue="" hidden="true">
+		<Label>accessTokenJson:</Label>
+	</Field>
+
+	<Field id="accessTokenSaved" type="label" visibleBindingId="accessTokenFailCheckbox" visibleBindingValue="success" alwaysUseInDialogHeightCalc="true">
+		<Label>Access token was saved successfully!</Label>
+	</Field>
+
+	<Field id="pollingIntervalVehicleData" type="textfield" defaultValue="60">
+		<Label>Polling interval for Vehicle Data (seconds):</Label>
+	</Field>
+
+	<!-- coming soon... integration with Google Maps --> 
+	
+	<!--
+    <Field id="sep2" type="separator"/>
+	
+	<Field id="instructionsGoogleMapsAPIKeyLabel" type="label" fontSize="small">
+		<Label>To be able to get distance and travel time to home, you first need to register for a free Google developers account. You can do that at https://developer.google.com. You need to get access to the Geocoding and the Distance Matrix APIs. Once you have registered, enter in your Google Maps API Key here:</Label>
+	</Field>
+	
+	<Field id="googleMapsAPIKey" type="textfield" defaultValue="">
+		<Label>Google Maps API Key:</Label>
+	</Field>
+
+	<Field id="homeAddress" type="textfield" defaultValue="123 Any St Philadelphia, PA 19380">
+		<Label>Home Address:</Label>
+	</Field>
+	-->
+	
+    <Field id="sep3" type="separator"/>
+    <Field id="useWebhooks" type="checkbox" defaultValue="false">
+        <Label>Use Bouncie API Webhooks</Label>
+    </Field>
+    <Field id="useWebhooksNote" type="label" fontSize="small" fontColor="darkgray">
+        <Label>Requires HTTPd 2 plugin with port forwarding on router.</Label>
+    </Field>
+
+    <Field id="sep4" type="separator"/>
+	
+    <Field id="logLevel" type="menu" defaultValue="20">
+        <Label>Event Logging Level:</Label>
+        <List>
+            <Option value="10">Debugging Messages</Option>
+            <Option value="20">Informational Messages</Option>
+            <Option value="30">Warning Messages</Option>
+            <Option value="40">Error Messages</Option>
+            <Option value="50">Critical Errors Only</Option>
+        </List>
+    </Field>       
+	
+</PluginConfig>
+
