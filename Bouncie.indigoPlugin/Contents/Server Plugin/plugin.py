@@ -29,6 +29,8 @@
 
 import indigo
 
+import logging
+
 import os
 import sys
 import random
@@ -39,6 +41,8 @@ import datetime
 import json
 import re
 import requests
+
+import httplib, urllib
 
 
 # Note the "indigo" module is automatically imported and made available inside
@@ -52,15 +56,12 @@ class Plugin(indigo.PluginBase):
 
 
 
-
-
-
 	########################################
 	def __init__(self, pluginId, pluginDisplayName, pluginVersion, pluginPrefs):
 		super(Plugin, self).__init__(pluginId, pluginDisplayName, pluginVersion, pluginPrefs)
 
-        self.logger = logging.getLogger("Plugin.Bouncie")
-
+		self.logger = logging.getLogger("Plugin.Bouncie")
+		
 		self.triggerDict = {}
 
 		try:
@@ -76,10 +77,10 @@ class Plugin(indigo.PluginBase):
 		httpd_plugin = indigo.server.getPlugin("com.flyingdiver.indigoplugin.httpd2")
 		if( httpd_plugin ):
 			if not httpd_plugin.isEnabled():
-				self.logger.debug("HTTPd 2 plugin not enabled")
+				self.logger.error("HTTPd 2 plugin not enabled")
 				return False
 		else:
-			self.logger.debug("HTTPd 2 plugin not found")
+			self.logger.warning("HTTPd 2 plugin not found")
 			return False
 		
 		return True
@@ -93,19 +94,22 @@ class Plugin(indigo.PluginBase):
 		self.pollingInterval = int(self.pluginPrefs.get("pollingIntervalVehicleData", 60) )
 
 		self.use_webhooks = bool(self.pluginPrefs.get("useWebhooks", False))
-		if self.use_webhooks:
+		if not self.use_webhooks:
+			self.logger.warning("webhooks disabled")
+			return
  
-			if( httpdPluginIsEnabled() ):
-				# set up for webhooks with the HTTPd 2 plugin
-				indigo.server.subscribeToBroadcast("com.flyingdiver.indigoplugin.httpd2","httpd_bouncie-webhook", "webhook_handler")
-		
-			else: 		
-				self.logger.error("HTTPd 2 plugin not enabled, disabling webhooks")
-				self.use_webhooks = False        
+ 		if( self.httpdPluginIsEnabled() ):
+			# set up for webhooks with the HTTPd 2 plugin
+			self.logger.debug("setting up webhooks")
+			indigo.server.subscribeToBroadcast("com.flyingdiver.indigoplugin.httpd2","httpd_bouncie-webhook", "webhook_handler")
+ 		
+ 		else: 		
+			self.logger.error("HTTPd 2 plugin not enabled, disabling webhooks")
+			self.use_webhooks = False        
 
 
 	def shutdown(self):
-		indigo.server.log(u"shutdown called")
+		self.logger.debug(u"shutdown called")
 
 	########################################
 	def runConcurrentThread(self):
@@ -134,9 +138,9 @@ class Plugin(indigo.PluginBase):
 							self.logger.error( u"problem getting vehicle data for imei: %s" % imei )
 							continue
 
-						self.logger.debug(data)
+						#self.logger.debug(data)
 						jsonResponse = json.loads(data)
-						self.logger.debug( jsonResponse )
+						#self.logger.debug( jsonResponse )
 						
 						'''
 						# sample response from vehicles:
@@ -154,7 +158,7 @@ class Plugin(indigo.PluginBase):
 										'location': 
 											{
 												'lat': 40.1234567, 
-												'lon': -75.1234567, 
+												'lon': -75.123456, 
 												'heading': 312, 
 												'address': None
 											}, 
@@ -190,8 +194,8 @@ class Plugin(indigo.PluginBase):
    										'lastUpdated': '2020-10-17T19:34:17.000Z', 
    										'location': 
    											{
-   												'lat': 40.0439193, 
-   												'lon': -75.6634761, 
+   												'lat': 40.1234567, 
+   												'lon': -75.123456, 
    												'heading': 149, 
    												'address': None
    											}, 
@@ -240,8 +244,8 @@ class Plugin(indigo.PluginBase):
 									location = stats['location']
 									if( 'lat' in location ):
 										keyValueList.append( {'key':'stats-location-lat', 'value':location['lat'] } )
-									if( 'long' in location ):
-										keyValueList.append( {'key':'stats-location-long', 'value':location['long'] } )
+									if( 'lon' in location ):
+										keyValueList.append( {'key':'stats-location-long', 'value':location['lon'] } )
 									if( 'heading' in location ):
 										keyValueList.append( {'key':'stats-location-heading', 'value':location['heading'] } )
 									if( 'address' in location ):
@@ -264,7 +268,7 @@ class Plugin(indigo.PluginBase):
 										keyValueList.append( {'key':'battery-status', 'value':battery['status'] } )
 									if( 'lastUpdated' in battery ):
 										keyValueList.append( {'key':'battery-lastUpdated', 'value':battery['lastUpdated'] } )
-						self.logger.debug( keyValueList )
+						#self.logger.debug( keyValueList )
 						dev.updateStatesOnServer( keyValueList )
 
 						'''
@@ -304,15 +308,16 @@ class Plugin(indigo.PluginBase):
 	########################################
 	def closedPrefsConfigUi(self, valuesDict, userCancelled):
 		if( not userCancelled ):
+		
+			try:
+				self.logLevel = int(valuesDict[u"logLevel"])
+			except:
+				self.logLevel = logging.INFO
+			self.indigo_log_handler.setLevel(self.logLevel)
+			self.logger.debug(u"logLevel = {}".format(self.logLevel))
 
-            try:
-                self.logLevel = int(valuesDict[u"logLevel"])
-            except:
-                self.logLevel = logging.INFO
-            self.indigo_log_handler.setLevel(self.logLevel)
-            self.logger.debug(u"logLevel = {}".format(self.logLevel))
-            
-			
+			#self.debug = valuesDict["debugLogging"]
+
 			self.pollingInterval = int(valuesDict["pollingIntervalVehicleData"])
 
 			self.use_webhooks = bool(valuesDict["useWebhooks"])
@@ -321,13 +326,13 @@ class Plugin(indigo.PluginBase):
 
 				if( self.httpdPluginIsEnabled() ):
 				
-					# ?? do we need to check to see if we are already subscribed? potential to subscribe multiple times?
+					# ?? do we need to check to see if we are already subscribed?
 					
 					# set up for webhooks with the HTTPd 2 plugin
 					indigo.server.subscribeToBroadcast("com.flyingdiver.indigoplugin.httpd2","httpd_bouncie-webhook", "webhook_handler")
 		
 				else: 		
-					self.logger.debug("HTTPd 2 plugin not enabled, disabling webhooks")
+					self.logger.error("HTTPd 2 plugin not enabled, disabling webhooks")
 					self.use_webhooks = False        
 			
 		return (True)
@@ -401,12 +406,10 @@ class Plugin(indigo.PluginBase):
 			self.logger.debug("webHook_handler: No matching Indigo device for Bouncie imei '{}'".format(payload['imei']))
 			return
 
+		# update that device with specifics on the event data received
 				
 		eventType = payload[ "eventType" ]
 		
-		# do we need to do any special handling based on event?
-		
-		'''
 		if eventType == "connect":
 			self.logger.debug( "connect" )
 		elif eventType == "disconnect":
@@ -417,17 +420,19 @@ class Plugin(indigo.PluginBase):
 			self.logger.debug( "mil" )
 		elif eventType == "tripStart":
 			self.logger.debug( "tripStart" )
+			dev.updateStateOnServer( "previousMilesFromHome", 0.0 )
+			dev.updateStateOnServer( "currentMilesFromHome", 0.0 )
 		elif eventType == "tripData":
 			self.logger.debug( "tripData" )
 		elif eventType == "tripMetrics":
 			self.logger.debug( "tripMetrics" )
 		elif eventType == "tripEnd":
 			self.logger.debug( "tripEnd" )
+			dev.updateStateOnServer( "previousMilesFromHome", 0.0 )
+			dev.updateStateOnServer( "currentMilesFromHome", 0.0 )
 		else:
 			self.logger.debug("{}: Unknown eventType '{}', {}".format(dev.name, eventType, payload))
-		'''
-		
-		# update the device with specifics on the event data received		
+
 		dev.updateStateOnServer( "webHookJSON-%s" % eventType, hookData[ "payload" ] )
 
 		# fire off the event
@@ -479,9 +484,333 @@ class Plugin(indigo.PluginBase):
 
 
 
-	# not used yet...	
+
+
+
+
+	########################################
+	# Sensor Action callback
+	######################
+	'''
+	def actionControlSensor(self, action, dev):
+		###### TURN ON ######
+		# Ignore turn on/off/toggle requests from clients since this is a read-only sensor.
+		if action.sensorAction == indigo.kSensorAction.TurnOn:
+			indigo.server.log(u"ignored \"%s\" %s request (sensor is read-only)" % (dev.name, "on"))
+			# But we could request a sensor state update if we wanted like this:
+			# dev.updateStateOnServer("onOffState", True)
+
+		###### TURN OFF ######
+		# Ignore turn on/off/toggle requests from clients since this is a read-only sensor.
+		elif action.sensorAction == indigo.kSensorAction.TurnOff:
+			indigo.server.log(u"ignored \"%s\" %s request (sensor is read-only)" % (dev.name, "off"))
+			# But we could request a sensor state update if we wanted like this:
+			# dev.updateStateOnServer("onOffState", False)
+
+		###### TOGGLE ######
+		# Ignore turn on/off/toggle requests from clients since this is a read-only sensor.
+		elif action.sensorAction == indigo.kSensorAction.Toggle:
+			indigo.server.log(u"ignored \"%s\" %s request (sensor is read-only)" % (dev.name, "toggle"))
+			# But we could request a sensor state update if we wanted like this:
+			# dev.updateStateOnServer("onOffState", not dev.onState)
+	'''
+	
+	########################################
+	# General Action callback
+	######################
+	'''
+	def actionControlUniversal(self, action, dev):
+		###### BEEP ######
+		if action.deviceAction == indigo.kUniversalAction.Beep:
+			# Beep the hardware module (dev) here:
+			# ** IMPLEMENT ME **
+			indigo.server.log(u"sent \"%s\" %s" % (dev.name, "beep request"))
+
+		###### STATUS REQUEST ######
+		elif action.deviceAction == indigo.kUniversalAction.RequestStatus:
+			# Query hardware module (dev) for its current status here:
+			# ** IMPLEMENT ME **
+			indigo.server.log(u"sent \"%s\" %s" % (dev.name, "status request"))
+	'''
+	
+	########################################
+	# Custom Plugin Action callbacks (defined in Actions.xml)
+	######################
+
+	def getLatLongData( self, dev ):
+
+		'''
+		# webhookJSON-tripData
+		{
+		  "eventType": "tripData",
+		  "imei": "12345123451234512",
+		  "vin": "111112222233333",
+		  "transactionId": "352602110001168-219-1607722515000",
+		  "data": [
+			{
+			  "timestamp": "2020-12-11T21:58:15.000Z",
+			  "timezone": "-0500",
+			  "speed": 0,
+			  "gps": {
+				"lat": 40.1111111,
+				"lon": -75.1111111,
+				"obdMaxSpeed": 58.408874,
+				"obdAverageSpeed": 26.097582,
+				"heading": 128,
+				"satelliteCount": 13,
+				"hdop": 1.5
+			  }
+			}
+		  ]
+		}
+		'''
+		retVal = dict()
+		retVal[ "latLongCSV" ] = None
+		retVal[ "latLongTimestamp" ] = None
+		retVal[ "latLongTimezone" ] = None
+		
+		# first, check to see if we have webhookJSON-tripData data
+		latLongCSV = None
+		try:
+	
+			tripData = dev.states["webHookJSON-tripData"]
+			#self.logger.debug( tripData )
+			tripDataJson = json.loads( tripData )
+			latLongCSV = "%s,%s" % ( tripDataJson[ "data" ][ 0 ][ "gps" ][ "lat" ], tripDataJson[ "data" ][ 0 ][ "gps" ][ "lon" ] )
+			self.logger.debug( "webHookJSON-tripData: %s" % latLongCSV )
+			latLongTimestamp = tripDataJson[ "data" ][ 0 ][ "timestamp" ]
+			latLongTimeszone = tripDataJson[ "data" ][ 0 ][ "timezone" ]
+				
+		except:
+	
+			try:
+				# if not, check stats-location-lat, stats-location-long
+				statsLocationLat = dev.states["stats-location-lat"]
+				statsLocationLong = dev.states["stats-location-long"]
+			
+				if( ( statsLocationLat == "" ) or ( statsLocationLong == "" ) ):
+					return retVal
+
+				latLongCSV = "%s,%s" % (statsLocationLat, statsLocationLong )
+				self.logger.debug( "stats-location: %s" % latLongCSV )
+				latLongTimestamp = dev.states["stats-lastUpdated"]
+				latLongTimeszone = ""
+			except:
+				return retVal
+
+		retVal[ "latLongCSV" ] = latLongCSV
+		retVal[ "latLongTimestamp" ] = latLongTimestamp
+		retVal[ "latLongTimezone" ] = latLongTimeszone
+		
+		return retVal
+
+	"""
+		Get ETA via Google Distance Matrix ****************************************************
+	"""
+	def getGoogleDistanceMatrix(self, dev, latLongCSV):
+
+		try:
+			self.logger.debug( "getGoogleDistanceMatrix for %s" % dev.name )
+			
+			googleMapsApiKey = self.pluginPrefs["googleMapsAPIKey"]
+			
+			##self.logger.debug( googleMapsApiKey )
+
+			theUrl = 'https://maps.googleapis.com/maps/api/distancematrix/json?origins='+str(latLongCSV)+'&' + urllib.urlencode({'destinations':self.pluginPrefs["homeAddress"]}) + '&key='+googleMapsApiKey+'&units=imperial'
+			self.logger.debug( theUrl )
+			
+			response = requests.get(theUrl, timeout=2)
+			
+			self.logger.debug( response.text )
+
+			dev.updateStateOnServer( "googleapis-distancematrix", response.text )
+			
+			distanceMatrixJson = json.loads(response.text)
+			
+			# Record last ETA Distance and this ETA Distance to help determine if we'll notify en route
+			distance = str(distanceMatrixJson['rows'][0]['elements'][0]['distance']['text']).split()
+			
+			#self.logger.debug( distance )
+			
+			if distance[1] == 'mi':
+				dev.updateStateOnServer( 'currentMilesFromHome', float(distance[0]) )
+			else:
+				dev.updateStateOnServer( 'currentMilesFromHome', 0.0 )
+
+
+			try:
+				percentChange = ((dev.states['previousMilesFromHome'] - dev.states['currentMilesFromHome']) / dev.states['previousMilesFromHome']) * 100
+			except Exception, e:
+				# Divide by zero when car[vehicleId]['previousMilesFromHome'] is zero
+				percentChange = 0.0
+				dev.updateStateOnServer( 'previousMilesFromHome', dev.states['currentMilesFromHome'] )
+			
+			# Only notify en route if there is a significant change in progress towards the house (or we're less than a mile away)
+			if percentChange > 50.0 or dev.states['currentMilesFromHome'] == 0.0:
+				dev.updateStateOnServer( 'previousMilesFromHome', dev.states['currentMilesFromHome'] )
+				if percentChange > 50.0:
+					
+					self._fireTrigger("approaching_home", dev.states['imei'])
+
+				#indigo.server.log(dev.name + " En Route; At " + location + ", " + ETA)
+			else:
+				self.logger.debug("Skipping due to lack of progress *towards* home; percent change = " + str(percentChange)) 
+
+
+			
+			return distanceMatrixJson
+		
+		except Exception, e:
+			self.logger.error('Location unknown, distance matrix calculation failed: ' + str(e))
+			return None
+		
+		return None
+
+
+	def getETA(self, pluginAction, dev):
+		
+		self.logger.debug( "getETA for \"%s\"" % (dev.name) )
+
+		eta = "Unknown"
+		
+		latLongData = self.getLatLongData( dev )
+		
+		if( latLongData[ "latLongCSV" ] == None ):
+			dev.updateStateOnServer( "ETA", eta )
+			self.logger.debug( eta )
+			return eta
+		
+		distanceMatrixJson = self.getGoogleDistanceMatrix( dev, latLongData[ "latLongCSV" ] )
+		
+		if( distanceMatrixJson != None ):
+		
+			'''
+			{
+			   "destination_addresses" : [ "West Chester, PA 19380, USA" ],
+			   "origin_addresses" : [ "180 Eagleview Blvd, Exton, PA 19341, USA" ],
+			   "rows" : [
+				  {
+					 "elements" : [
+						{
+						   "distance" : {
+							  "text" : "6.7 mi",
+							  "value" : 10738
+						   },
+						   "duration" : {
+							  "text" : "18 mins",
+							  "value" : 1071
+						   },
+						   "status" : "OK"
+						}
+					 ]
+				  }
+			   ],
+			   "status" : "OK"
+			}			
+			'''
+			text = distanceMatrixJson['rows'][0]['elements'][0]['duration']['text']
+			seconds = distanceMatrixJson['rows'][0]['elements'][0]['duration']['value']
+			
+			# when did we get this geoLocation data?
+			self.logger.debug( str(latLongData[ "latLongTimestamp" ]) )
+			
+			if '.' in str(latLongData[ "latLongTimestamp" ]):
+				timestamp = datetime.datetime.strptime(str(latLongData[ "latLongTimestamp" ]), '%Y-%m-%dT%H:%M:%S.%fZ')
+			else:
+				timestamp = datetime.datetime.strptime(str(latLongData[ "latLongTimestamp" ]), '%Y-%m-%dT%H:%M:%SZ')
+			
+			if( str( latLongData[ "latLongTimezone" ] ) != "" ):
+				offset = int( str( latLongData[ "latLongTimezone" ] )[ -4:-2 ] )
+				if( str( latLongData[ "latLongTimezone" ] )[0] == "-" ):
+					offset = -offset
+				timestamp = timestamp + datetime.timedelta(hours=offset)
+		
+			# Give ETA as event timestamp plus google travel time to home
+			ETA = timestamp + datetime.timedelta(seconds=seconds)
+		
+			#self.logger.debug( ETA )
+			
+			eta = text + " / " + str(dev.states['currentMilesFromHome']) + " miles from home, ETA " + ETA.strftime("%I:%M %p")
+			self.logger.debug( eta )
+			dev.updateStateOnServer( "ETA", eta )
+			
+			dev.updateStateOnServer( "formatted_address", str( distanceMatrixJson['origin_addresses'][ 0 ] ) )
+			
+		return eta
+	
+	
+	
+	"""
+		Google Geocode Location ****************************************************
+	"""
+	def getGeocodeLocation(self, dev, latLongCSV):
+		
+		responseJson = None
+
+		try:
+			self.logger.debug("getLocation %s" % dev.name)
+
+			googleMapsApiKey = self.pluginPrefs["googleMapsAPIKey"]
+	
+			#self.logger.debug( googleMapsApiKey )
+			
+			apiURL = 'https://maps.googleapis.com/maps/api/geocode/json?latlng='+str(latLongCSV)+'&key='+googleMapsApiKey
+			##self.logger.debug( apiURL )
+						
+			response = requests.get(apiURL, timeout=2)
+
+			##self.logger.debug( response.text )
+
+			dev.updateStateOnServer( "googleapis-geocode", response.text )
+
+			responseJson = json.loads(response.text)
+			
+			dev.updateStateOnServer( "formatted_address", str( responseJson['results'][0]['formatted_address'] ) )
+			
+			return responseJson
+
+		except Exception, e:
+			iself.logger.error('Location unknown, geocode failed: ' + str(e))
+			pass
+	
+		return responseJson
+
+
+	def getAddress(self, pluginAction, dev):
+		
+		self.logger.debug( "getAddress for \"%s\"" % (dev.name) )
+
+		currentStreet = "Unknown"
+		
+		latLongData = self.getLatLongData( dev )
+		
+		if( latLongData[ "latLongCSV" ] == None ):
+			dev.updateStateOnServer( "currentStreet", currentStreet )
+			self.logger.debug( currentStreet )
+			return currentStreet
+		
+		locationJson = self.getGeocodeLocation( dev, latLongData[ "latLongCSV" ] )
+	
+		if( locationJson != None ):
+		
+			for component in locationJson['results'][0]['address_components']:
+				self.logger.debug( "for loop address_components" )
+				if component['types'][0] == 'route':
+					currentStreet = component['long_name']
+					self.logger.debug( "route found %s" % currentStreet )
+					break
+		
+			self.logger.debug( "getLocation: %s" % currentStreet )
+			dev.updateStateOnServer( "currentStreet", currentStreet )
+			return currentStreet
+
+		self.logger.debug( currentStreet )
+		return currentStreet
+
+	
+
 	def _getTrips( self, imei ):
-		self.logger.debug(u"_requestVehicle")
+		#self.logger.debug(u"_requestVehicle")
 
 		# gps-format can be either 'geojson' or 'polyline'
 		
@@ -503,12 +832,12 @@ class Plugin(indigo.PluginBase):
 			while retries > 0:
 			
 				jsonResponse = json.loads(self.pluginPrefs['accessTokenJson'])
-				self.logger.debug("Bearer %s" % jsonResponse["access_token"])
+				#self.logger.debug("Bearer %s" % jsonResponse["access_token"])
 	
 				headersData = {"Content-type": "application/x-www-form-urlencoded", "Authorization": "%s" % jsonResponse["access_token"]}
 
 				r = requests.get(self.bouncieAPIBaseUrl + target, params=paramsList, timeout=2, headers=headersData)
-				self.logger.debug( r )
+				#self.logger.debug( r )
 			
 				if( r.status_code == 200 ):
 					data = r.text
@@ -525,7 +854,7 @@ class Plugin(indigo.PluginBase):
 						
 
 		except Exception, e:
-			indigo.server.log("FYI - Exception caught _requestData: " + str(e))
+			self.logger.error("FYI - Exception caught _requestData: " + str(e))
 
 		return data
 
@@ -566,7 +895,7 @@ class Plugin(indigo.PluginBase):
 
 	def _requestVehicle( self, imei ):
 	
-		self.logger.debug(u"_requestVehicle")
+		#self.logger.debug(u"_requestVehicle")
 
 		data = self._requestData("vehicles", { 'imei': imei } )
 		return data
@@ -616,6 +945,12 @@ class Plugin(indigo.PluginBase):
 
 
 
+
+
+
+
+
+
 	########################################
 	# Plugin Config callbacks (defined in PluginConfig.xml)
 	######################
@@ -633,6 +968,9 @@ class Plugin(indigo.PluginBase):
 
 
 
+
+
+
 	def _requestAccessToken(self, code, clientId, clientSecret):
 		data = ""
 		try:
@@ -645,7 +983,7 @@ class Plugin(indigo.PluginBase):
 
 			self.logger.debug(data)
 		except Exception, e:
-			indigo.server.log("FYI - Exception caught _requestAccessToken: " + str(e))
+			self.logger.error("FYI - Exception caught _requestAccessToken: " + str(e))
 
 		return data
 		
@@ -663,7 +1001,7 @@ class Plugin(indigo.PluginBase):
 			
 			return True
 		except Exception, e:
-			indigo.server.log("FYI - Exception caught saving access token: " + str(e))
+			self.logger.error("FYI - Exception caught saving access token: " + str(e))
 			return False
 
 
@@ -674,7 +1012,7 @@ class Plugin(indigo.PluginBase):
 		data = self._requestAccessToken(self.pluginPrefs["code"], self.pluginPrefs["clientId"], self.pluginPrefs["clientSecret"])
 
 		if( not self._saveAccessToken(data) ):
-			indigo.server.log( "Unable to automatically renew access token. Please re-configure Bouncie to renew access token." )
+			self.logger.error( "Unable to automatically renew access token. Please re-configure Bouncie to renew access token." )
 			return False
 
 		return True

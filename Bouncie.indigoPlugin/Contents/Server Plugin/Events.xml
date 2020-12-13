@@ -74,8 +74,6 @@
 		</ConfigUI>
     </Event>
     
-    <!-- coming soon... with integration from Google Maps -->
-    
     <!--
     <Event id="location_updated">
         <Name>Location Updated</Name>
@@ -86,6 +84,8 @@
 			</Field>
 		</ConfigUI>
     </Event>
+    -->
+    
     <Event id="approaching_home">
         <Name>Approaching Home</Name>
         <ConfigUI>
@@ -95,7 +95,6 @@
 			</Field>
 		</ConfigUI>
     </Event>
-    -->
     
     <!--
     <Event id="miles_to_home">

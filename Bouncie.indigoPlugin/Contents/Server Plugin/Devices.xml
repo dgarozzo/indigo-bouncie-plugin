@@ -158,9 +158,27 @@
 				<ControlPageLabel>webHookJSON-tripEnd</ControlPageLabel>
 			</State>
 
-			<!-- coming soon... with integration from Google Maps -->
-			
-			<!--
+			<State id="googleapis-geocode" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>googleapis-geocode</TriggerLabel>
+				<ControlPageLabel>googleapis-geocode</ControlPageLabel>
+			</State>
+			<State id="googleapis-distancematrix" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>googleapis-distancematrix</TriggerLabel>
+				<ControlPageLabel>googleapis-distancematrix</ControlPageLabel>
+			</State>
+			<State id="currentStreet" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>currentStreet</TriggerLabel>
+				<ControlPageLabel>currentStreet</ControlPageLabel>
+			</State>
+			<State id="formatted_address" readonly="YES">
+				<ValueType>String</ValueType>
+				<TriggerLabel>formatted_address</TriggerLabel>
+				<ControlPageLabel>formatted_address</ControlPageLabel>
+			</State>
+
 			<State id="ETA" readonly="YES">
 				<ValueType>String</ValueType>
 				<TriggerLabel>ETA</TriggerLabel>
@@ -176,7 +194,6 @@
 				<TriggerLabel>currentMilesFromHome</TriggerLabel>
 				<ControlPageLabel>currentMilesFromHome</ControlPageLabel>
 			</State>
-			-->
 		</States>
 	</Device>
 </Devices>

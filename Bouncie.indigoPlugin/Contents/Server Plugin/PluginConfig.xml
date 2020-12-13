@@ -52,9 +52,6 @@
 		<Label>Polling interval for Vehicle Data (seconds):</Label>
 	</Field>
 
-	<!-- coming soon... integration with Google Maps --> 
-	
-	<!--
     <Field id="sep2" type="separator"/>
 	
 	<Field id="instructionsGoogleMapsAPIKeyLabel" type="label" fontSize="small">
@@ -68,8 +65,7 @@
 	<Field id="homeAddress" type="textfield" defaultValue="123 Any St Philadelphia, PA 19380">
 		<Label>Home Address:</Label>
 	</Field>
-	-->
-	
+
     <Field id="sep3" type="separator"/>
     <Field id="useWebhooks" type="checkbox" defaultValue="false">
         <Label>Use Bouncie API Webhooks</Label>
@@ -79,7 +75,7 @@
     </Field>
 
     <Field id="sep4" type="separator"/>
-	
+
     <Field id="logLevel" type="menu" defaultValue="20">
         <Label>Event Logging Level:</Label>
         <List>
@@ -89,7 +85,7 @@
             <Option value="40">Error Messages</Option>
             <Option value="50">Critical Errors Only</Option>
         </List>
-    </Field>       
+    </Field>
 	
 </PluginConfig>
 
